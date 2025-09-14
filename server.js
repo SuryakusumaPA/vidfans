@@ -7,15 +7,11 @@ const multer = require('multer');
 const fs = require('fs');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
-// In-memory "database" (for demo only)
+// In-memory database (demo only, ganti ke DB beneran kalau serius)
 const users = [];
-const videos = [
-  { id: 1, title: "Video 1", price: 10, filename: null },
-  { id: 2, title: "Video 2", price: 15, filename: null },
-  { id: 3, title: "Video 3", price: 20, filename: null },
-];
+const videos = [];
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -27,7 +23,7 @@ app.use(session({
 }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Authentication middleware
+// Auth middleware
 function requireLogin(req, res, next) {
   if (!req.session.userId) {
     return res.status(401).json({ error: 'Unauthorized' });
@@ -35,14 +31,14 @@ function requireLogin(req, res, next) {
   next();
 }
 
-// === Multer Config (for video upload) ===
+// === Multer Config (upload video ke folder uploads/) ===
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, 'uploads/'),
   filename: (req, file, cb) => cb(null, Date.now() + path.extname(file.originalname))
 });
 const upload = multer({ storage });
 
-// Routes
+// === Routes ===
 
 // Register
 app.post('/api/register', async (req, res) => {
@@ -59,13 +55,10 @@ app.post('/api/register', async (req, res) => {
 app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
   const user = users.find(u => u.username === username);
-  if (!user) {
-    return res.status(400).json({ error: 'Invalid username or password' });
-  }
+  if (!user) return res.status(400).json({ error: 'Invalid username or password' });
   const match = await bcrypt.compare(password, user.password);
-  if (!match) {
-    return res.status(400).json({ error: 'Invalid username or password' });
-  }
+  if (!match) return res.status(400).json({ error: 'Invalid username or password' });
+  
   req.session.userId = user.id;
   req.session.username = user.username;
   res.json({ message: 'Logged in' });
@@ -77,11 +70,9 @@ app.post('/api/logout', (req, res) => {
   res.json({ message: 'Logged out' });
 });
 
-// Get current user info
+// Get current user
 app.get('/api/me', (req, res) => {
-  if (!req.session.userId) {
-    return res.json(null);
-  }
+  if (!req.session.userId) return res.json(null);
   res.json({ id: req.session.userId, username: req.session.username });
 });
 
@@ -90,11 +81,11 @@ app.get('/api/videos', (req, res) => {
   res.json(videos);
 });
 
-// Add a video (with file upload)
+// Add video (upload)
 app.post('/api/videos', requireLogin, upload.single('videoFile'), (req, res) => {
   const { title, price } = req.body;
   if (!title || !price || !req.file) {
-    return res.status(400).json({ error: 'Title, price, and video file required' });
+    return res.status(400).json({ error: 'Title, price, and video required' });
   }
 
   const newVideo = {
@@ -108,13 +99,12 @@ app.post('/api/videos', requireLogin, upload.single('videoFile'), (req, res) => 
   res.json(newVideo);
 });
 
-// Delete a video
+// Delete video
 app.delete('/api/videos/:id', requireLogin, (req, res) => {
   const videoId = Number(req.params.id);
   const index = videos.findIndex(v => v.id === videoId);
   if (index === -1) return res.status(404).json({ error: 'Video not found' });
 
-  // hapus file dari uploads/
   if (videos[index].filename) {
     const filePath = path.join(__dirname, 'uploads', videos[index].filename);
     fs.unlink(filePath, err => {
@@ -128,5 +118,5 @@ app.delete('/api/videos/:id', requireLogin, (req, res) => {
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`✅ Server running on http://localhost:${PORT}`);
 });
