@@ -23,7 +23,7 @@
 
   <!-- Main content -->
   <div id="main">
-    <!-- Auth -->
+    <!-- Auth area -->
     <div id="auth">
       <h2 class="title">Login</h2>
       <form id="loginForm" class="auth-form">
@@ -49,10 +49,9 @@
       <ul id="videoList"></ul>
 
       <h3 class="title">Sell a Video</h3>
-      <form id="sellForm" class="auth-form" enctype="multipart/form-data">
-        <input type="text" name="title" placeholder="Video Title" required />
-        <input type="number" name="price" placeholder="Price" required min="0" />
-        <input type="file" name="videoFile" accept="video/*" required />
+      <form id="sellForm" class="auth-form">
+        <input type="text" id="videoTitle" placeholder="Video Title" required />
+        <input type="number" id="videoPrice" placeholder="Price" required min="0" />
         <button type="submit" class="btn-primary">Add Video</button>
       </form>
     </div>
