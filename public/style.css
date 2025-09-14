@@ -148,4 +148,65 @@ button:hover {
   box-shadow: 0 4px 10px rgba(139,92,246,0.4);
 }
 
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  body {
+    flex-direction: column;
+  }
+
+  #sidebar {
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+  }
+
+  #sidebar .logo {
+    margin-bottom: 0;
+  }
+
+  #sidebar nav ul {
+    flex-direction: row;
+    gap: 10px;
+  }
+
+  #sidebar nav ul li a {
+    padding: 8px 10px;
+    font-size: 0.9em;
+  }
+
+  #main {
+    padding: 20px;
+  }
+
+  #auth, #userArea {
+    width: 100%;
+    margin: 10px 0;
+    padding: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  #sidebar nav ul {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  #sidebar nav ul li a {
+    font-size: 0.8em;
+    padding: 6px 8px;
+  }
+
+  button {
+    font-size: 0.9em;
+    padding: 10px;
+  }
+
+  input {
+    font-size: 0.9em;
+    padding: 10px;
+  }
+}
+
 
