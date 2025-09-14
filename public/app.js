@@ -113,4 +113,40 @@ boxButton.addEventListener('click', () => {
 });
 
 // Initial load
+
 loadUser ();
+
+const sellForm = document.getElementById("sellForm");
+const videoList = document.getElementById("videoList");
+
+sellForm.addEventListener("submit", function (e) {
+  e.preventDefault();
+
+  const title = document.getElementById("videoTitle").value;
+  const price = document.getElementById("videoPrice").value;
+  const fileInput = document.getElementById("videoFile");
+  const file = fileInput.files[0];
+
+  if (!file) {
+    alert("Please select a video file.");
+    return;
+  }
+
+  // buat list item
+  const li = document.createElement("li");
+  li.innerHTML = `
+    <strong>${title}</strong> - $${price} <br>
+    🎬 File: ${file.name}
+    <button class="btn-danger btn-delete" style="margin-left:10px;">❌ Hapus</button>
+  `;
+
+  // tombol hapus
+  li.querySelector(".btn-delete").addEventListener("click", () => {
+    li.remove();
+  });
+
+  videoList.appendChild(li);
+
+  // reset form
+  sellForm.reset();
+});
