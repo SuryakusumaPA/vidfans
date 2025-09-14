@@ -1,78 +1,116 @@
-async function fetchUser() {
-  const res = await fetch("/api/me");
+async function apiRequest(url, method = 'GET', data) {
+  const options = { method, headers: {} };
+  if (data) {
+    options.headers['Content-Type'] = 'application/json';
+    options.body = JSON.stringify(data);
+  }
+  const res = await fetch(url, options);
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || 'API error');
+  }
   return res.json();
 }
 
-async function loadVideos() {
-  const res = await fetch("/api/videos");
-  const videos = await res.json();
-  const list = document.getElementById("videoList");
-  list.innerHTML = "";
-  videos.forEach(video => {
-    const li = document.createElement("li");
-    li.innerHTML = `
-      <strong>${video.title}</strong> - $${video.price}
-      ${video.filename ? `<br><video src="/uploads/${video.filename}" width="200" controls></video>` : ""}
-      <button class="btn-danger btn-delete" data-id="${video.id}">❌ Hapus</button>
-    `;
-    li.querySelector(".btn-delete").addEventListener("click", async () => {
-      await fetch(`/api/videos/${video.id}`, { method: "DELETE" });
-      loadVideos();
-    });
-    list.appendChild(li);
-  });
+const loginForm = document.getElementById('loginForm');
+const registerForm = document.getElementById('registerForm');
+const logoutBtn = document.getElementById('logoutBtn');
+const authDiv = document.getElementById('auth');
+const userArea = document.getElementById('userArea');
+const userNameDisplay = document.getElementById('userNameDisplay');
+const videoList = document.getElementById('videoList');
+const sellForm = document.getElementById('sellForm');
+const boxButton = document.getElementById('boxButton');
+
+function showError(message) {
+  alert(message);
 }
 
-document.getElementById("loginForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const username = document.getElementById("username").value;
-  const password = document.getElementById("password").value;
-  const res = await fetch("/api/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, password }),
-  });
-  if (res.ok) location.reload();
-  else alert("Login failed");
-});
+async function loadUser () {
+  try {
+    const user = await apiRequest('/api/me');
+    if (user) {
+      authDiv.style.display = 'none';
+      userArea.style.display = 'block';
+      userNameDisplay.textContent = user.username;
+      loadVideos();
+    } else {
+      authDiv.style.display = 'block';
+      userArea.style.display = 'none';
+    }
+  } catch (e) {
+    showError(e.message);
+  }
+}
 
-document.getElementById("registerForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const username = document.getElementById("regUsername").value;
-  const password = document.getElementById("regPassword").value;
-  const res = await fetch("/api/register", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, password }),
-  });
-  if (res.ok) alert("User registered, now login!");
-  else alert("Register failed");
-});
+async function loadVideos() {
+  try {
+    const videos = await apiRequest('/api/videos');
+    videoList.innerHTML = '';
+    videos.forEach(v => {
+      const li = document.createElement('li');
+      li.textContent = `${v.title} - $${v.price.toFixed(2)}`;
+      videoList.appendChild(li);
+    });
+  } catch (e) {
+    showError(e.message);
+  }
+}
 
-document.getElementById("logoutBtn").addEventListener("click", async () => {
-  await fetch("/api/logout", { method: "POST" });
-  location.reload();
-});
-
-document.getElementById("sellForm").addEventListener("submit", async (e) => {
+loginForm.addEventListener('submit', async e => {
   e.preventDefault();
-  const formData = new FormData(e.target);
-  const res = await fetch("/api/videos", { method: "POST", body: formData });
-  if (res.ok) {
-    loadVideos();
-    e.target.reset();
-  } else {
-    const err = await res.json();
-    alert(err.error);
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value;
+  try {
+    await apiRequest('/api/login', 'POST', { username, password });
+    await loadUser ();
+  } catch (e) {
+    showError(e.message);
   }
 });
 
-// On load
-fetchUser().then(user => {
-  if (user) {
-    document.getElementById("auth").style.display = "none";
-    document.getElementById("userArea").style.display = "block";
-    document.getElementById("userNameDisplay").textContent = user.username;
-    loadVideos();
+registerForm.addEventListener('submit', async e => {
+  e.preventDefault();
+  const username = document.getElementById('regUsername').value.trim();
+  const password = document.getElementById('regPassword').value;
+  try {
+    await apiRequest('/api/register', 'POST', { username, password });
+    alert('Registered successfully! You can now log in.');
+    registerForm.reset();
+  } catch (e) {
+    showError(e.message);
   }
 });
+
+logoutBtn.addEventListener('click', async () => {
+  try {
+    await apiRequest('/api/logout', 'POST');
+    await loadUser ();
+  } catch (e) {
+    showError(e.message);
+  }
+});
+
+sellForm.addEventListener('submit', async e => {
+  e.preventDefault();
+  const title = document.getElementById('videoTitle').value.trim();
+  const price = parseFloat(document.getElementById('videoPrice').value);
+  if (!title || isNaN(price) || price < 0) {
+    showError('Please enter valid title and price');
+    return;
+  }
+  try {
+    await apiRequest('/api/videos', 'POST', { title, price });
+    sellForm.reset();
+    loadVideos();
+  } catch (e) {
+    showError(e.message);
+  }
+});
+
+boxButton.addEventListener('click', () => {
+  alert('Box button clicked!');
+});
+
+// Initial load
+loadUser ();
