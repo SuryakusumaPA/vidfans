@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Video Marketplace</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Sidebar -->
+  <div id="sidebar">
+    <h2 class="logo">VM</h2>
+    <nav>
+      <ul>
+        <li><a href="#" id="nav-home">🏠 Home</a></li>
+        <li><a href="#" id="nav-videos">🎬 Videos</a></li>
+        <li><a href="#" id="nav-sell">💰 Sell</a></li>
+        <li><a href="#" id="nav-auth">🔑 Login</a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <!-- Main content -->
+  <div id="main">
+    <!-- Auth area -->
+    <div id="auth">
+      <h2 class="title">Login</h2>
+      <form id="loginForm" class="auth-form">
+        <input type="text" id="username" placeholder="👤 Username" required />
+        <input type="password" id="password" placeholder="🔒 Password" required />
+        <button type="submit" class="btn-primary">Login</button>
+      </form>
+
+      <h3 class="title">Or Register</h3>
+      <form id="registerForm" class="auth-form">
+        <input type="text" id="regUsername" placeholder="👤 New Username" required />
+        <input type="password" id="regPassword" placeholder="🔒 New Password" required />
+        <button type="submit" class="btn-secondary">Register</button>
+      </form>
+    </div>
+
+    <!-- User Area -->
+    <div id="userArea" style="display:none;">
+      <p>Welcome, <span id="userNameDisplay"></span>! 
+         <button id="logoutBtn" class="btn-danger">Logout</button>
+      </p>
+      <h2 class="title">Videos for Sale</h2>
+      <ul id="videoList"></ul>
+
+      <h3 class="title">Sell a Video</h3>
+      <form id="sellForm" class="auth-form">
+        <input type="text" id="videoTitle" placeholder="Video Title" required />
+        <input type="number" id="videoPrice" placeholder="Price" required min="0" />
+        <button type="submit" class="btn-primary">Add Video</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

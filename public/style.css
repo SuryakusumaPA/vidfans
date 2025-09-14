@@ -1,0 +1,149 @@
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  display: flex;
+  height: 100vh;
+  background: #0f0f0f;
+  color: #e5e5e5;
+}
+
+/* Sidebar */
+#sidebar {
+  width: 220px;
+  background: #1a1a1a;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.5);
+}
+
+#sidebar .logo {
+  color: #8b5cf6;
+  font-size: 24px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+#sidebar nav ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+#sidebar nav ul li a {
+  text-decoration: none;
+  color: #e5e5e5;
+  padding: 12px;
+  border-radius: 8px;
+  transition: background 0.3s, color 0.3s;
+}
+
+#sidebar nav ul li a:hover {
+  background: #8b5cf6;
+  color: #fff;
+}
+
+/* Main content */
+#main {
+  flex: 1;
+  padding: 40px;
+  overflow-y: auto;
+}
+
+/* Card */
+#auth, #userArea {
+  max-width: 500px;
+  margin: 0 auto;
+  background: #1a1a1a;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+}
+
+.title {
+  color: #fff;
+  font-size: 1.3em;
+  margin-bottom: 15px;
+  font-weight: 600;
+  border-bottom: 1px solid #333;
+  padding-bottom: 6px;
+}
+
+/* Form */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+input {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #333;
+  background: #111;
+  color: #e5e5e5;
+  transition: border 0.3s, box-shadow 0.3s;
+}
+
+input:focus {
+  border-color: #8b5cf6;
+  box-shadow: 0 0 6px rgba(139, 92, 246, 0.6);
+  outline: none;
+}
+
+/* Buttons */
+button {
+  font-size: 1em;
+  font-weight: 600;
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.3s;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+  color: white;
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, #3b82f6, #06b6d4);
+  color: white;
+}
+
+.btn-danger {
+  background: #dc2626;
+  color: white;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 12px rgba(139,92,246,0.6);
+}
+
+/* Video List */
+#videoList {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+#videoList li {
+  padding: 14px 16px;
+  border-radius: 8px;
+  background: #111;
+  border: 1px solid #333;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+#videoList li:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(139,92,246,0.4);
+}
