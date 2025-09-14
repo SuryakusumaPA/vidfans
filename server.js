@@ -3,15 +3,17 @@ const session = require('express-session');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcryptjs');
 const path = require('path');
-const multer = require('multer');
-const fs = require('fs');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = 3000;
 
-// In-memory database (demo only, ganti ke DB beneran kalau serius)
+// In-memory "database" (for demo only)
 const users = [];
-const videos = [];
+const videos = [
+  { id: 1, title: "Video 1", price: 10 },
+  { id: 2, title: "Video 2", price: 15 },
+  { id: 3, title: "Video 3", price: 20 },
+];
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -23,7 +25,7 @@ app.use(session({
 }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Auth middleware
+// Authentication middleware
 function requireLogin(req, res, next) {
   if (!req.session.userId) {
     return res.status(401).json({ error: 'Unauthorized' });
@@ -31,34 +33,30 @@ function requireLogin(req, res, next) {
   next();
 }
 
-// === Multer Config (upload video ke folder uploads/) ===
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, 'uploads/'),
-  filename: (req, file, cb) => cb(null, Date.now() + path.extname(file.originalname))
-});
-const upload = multer({ storage });
+// Routes
 
-// === Routes ===
-
-// Register
+// Register (for demo, simple form)
 app.post('/api/register', async (req, res) => {
   const { username, password } = req.body;
   if (users.find(u => u.username === username)) {
-    return res.status(400).json({ error: 'User already exists' });
+    return res.status(400).json({ error: 'User  already exists' });
   }
   const hashedPassword = await bcrypt.hash(password, 10);
   users.push({ id: users.length + 1, username, password: hashedPassword });
-  res.json({ message: 'User registered' });
+  res.json({ message: 'User  registered' });
 });
 
 // Login
 app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
   const user = users.find(u => u.username === username);
-  if (!user) return res.status(400).json({ error: 'Invalid username or password' });
+  if (!user) {
+    return res.status(400).json({ error: 'Invalid username or password' });
+  }
   const match = await bcrypt.compare(password, user.password);
-  if (!match) return res.status(400).json({ error: 'Invalid username or password' });
-  
+  if (!match) {
+    return res.status(400).json({ error: 'Invalid username or password' });
+  }
   req.session.userId = user.id;
   req.session.username = user.username;
   res.json({ message: 'Logged in' });
@@ -70,9 +68,11 @@ app.post('/api/logout', (req, res) => {
   res.json({ message: 'Logged out' });
 });
 
-// Get current user
+// Get current user info
 app.get('/api/me', (req, res) => {
-  if (!req.session.userId) return res.json(null);
+  if (!req.session.userId) {
+    return res.json(null);
+  }
   res.json({ id: req.session.userId, username: req.session.username });
 });
 
@@ -81,42 +81,21 @@ app.get('/api/videos', (req, res) => {
   res.json(videos);
 });
 
-// Add video (upload)
-app.post('/api/videos', requireLogin, upload.single('videoFile'), (req, res) => {
+// Add a video (selling)
+app.post('/api/videos', requireLogin, (req, res) => {
   const { title, price } = req.body;
-  if (!title || !price || !req.file) {
-    return res.status(400).json({ error: 'Title, price, and video required' });
+  if (!title || !price) {
+    return res.status(400).json({ error: 'Title and price required' });
   }
-
   const newVideo = {
     id: videos.length + 1,
     title,
     price: Number(price),
-    filename: req.file.filename
   };
-
   videos.push(newVideo);
   res.json(newVideo);
 });
 
-// Delete video
-app.delete('/api/videos/:id', requireLogin, (req, res) => {
-  const videoId = Number(req.params.id);
-  const index = videos.findIndex(v => v.id === videoId);
-  if (index === -1) return res.status(404).json({ error: 'Video not found' });
-
-  if (videos[index].filename) {
-    const filePath = path.join(__dirname, 'uploads', videos[index].filename);
-    fs.unlink(filePath, err => {
-      if (err) console.error("Failed to delete file:", err.message);
-    });
-  }
-
-  videos.splice(index, 1);
-  res.json({ message: 'Video deleted' });
-});
-
-// Start server
 app.listen(PORT, () => {
-  console.log(`✅ Server running on http://localhost:${PORT}`);
+  console.log(`Server running on http://localhost:${PORT}`);
 });
