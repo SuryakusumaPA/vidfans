@@ -7,39 +7,6 @@ const path = require('path');
 const app = express();
 const PORT = 3000;
 
-// ====== Upload & Delete Video ======
-const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
-
-// Konfigurasi Multer (folder simpan uploads/)
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, "uploads/"),
-  filename: (req, file, cb) => cb(null, Date.now() + path.extname(file.originalname))
-});
-const upload = multer({ storage });
-
-// Endpoint upload video
-app.post("/upload", upload.single("videoFile"), (req, res) => {
-  if (!req.file) return res.status(400).json({ success: false, message: "No file uploaded" });
-
-  res.json({
-    success: true,
-    filename: req.file.filename,
-    originalName: req.file.originalname
-  });
-});
-
-// Endpoint hapus video
-app.delete("/delete/:filename", (req, res) => {
-  const filePath = path.join(__dirname, "uploads", req.params.filename);
-
-  fs.unlink(filePath, (err) => {
-    if (err) return res.status(500).json({ success: false, error: err.message });
-    res.json({ success: true, message: "Video deleted" });
-  });
-});
-
 // In-memory "database" (for demo only)
 const users = [];
 const videos = [
@@ -131,5 +98,4 @@ app.post('/api/videos', requireLogin, (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
-
 });
